@@ -50,6 +50,7 @@ class ChromeEvent:
                 self.play()
 
     def on_mqtt_disconnect(self, client, userdata, rc):
+        print("----------- mqtt disconnect ---------------")
         print(self.device.cast_type)
         print(rc)
     
