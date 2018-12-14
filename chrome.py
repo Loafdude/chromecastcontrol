@@ -12,13 +12,14 @@ import pychromecast
 from chromeevent import ChromeEvent
 from mqtt import MQTT
 
-mqtt = mqtt.MQTT()
+mqtt = MQTT()
+mqtt.subscriptions = []
 mqtt.conn()
 mqtt.loop_start()
 
 CASTS = pychromecast.get_chromecasts()
 c = CASTS[2]
-e = ChromeEvent(c)
+e = ChromeEvent(c, 'Global', mqtt)
 
 if len(CASTS) == 0:
     print("No Devices Found")
