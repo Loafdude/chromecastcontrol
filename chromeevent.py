@@ -10,50 +10,48 @@ import os
 
 class ChromeEvent:
     """ Chrome event handling """
-    def __init__(self, device):
-
-        self.mqtthost = '10.9.8.184'
-        self.mqttport = 1883
-        self.mqttroot = 'Home/ChromeCasts/'
+    def __init__(self, device, room, mqtt):
 
         self.device = device
         self.device.register_status_listener(self)
-        self.device.media_controller.register_status_listener(self)
         self.status = ChromeState(device.device)
-        if self.device.cast_type != 'audio':
-            self.status.setApp('Backdrop')
-        self.mqttroot = self.mqttroot + '/' + self.device.cast_type
-        client = mqtt_client.Client(self.device.cast_type + '_client')
-        client.on_message = self.on_mqtt_message
-        client.connect(self.mqtthost)
-        client.loop_start()
-        client.subscribe(self.mqttroot + '/control/#')
-        client.on_disconnect = self.on_mqtt_disconnect
+        self.room = room
+        self.mqtt = mqtt
+        self.mqttpath = 'Home/' + self.room + '/ChromeCasts/' + self.device.name
+        # self.device.media_controller.register_status_listener(self)
+        # if self.device.cast_type != 'audio':
+        #     self.status.setApp('Backdrop')
+        # client = mqtt_client.Client(self.device.cast_type + '_client')
+        # client.on_message = self.on_mqtt_message
+        # client.connect(self.mqtthost)
+        # client.loop_start()
+        # client.subscribe(self.mqttroot + '/control/#')
+        # client.on_disconnect = self.on_mqtt_disconnect
 
-    def on_mqtt_message(self, client, userdata, message):
-        parameter = message.payload.decode("utf-8")
-        cmd = os.path.basename(os.path.normpath(message.topic))
-        if cmd == 'play':
-            self.play(parameter)
-        else:
-            if parameter == 'pause':
-                self.pause()
-            if parameter == 'fwd':
-                self.fwd()
-            if parameter == 'rev':
-                self.rev()
-            if parameter == 'quit':
-                self.quit()
-            if parameter == 'stop':
-                self.stop()
-            if parameter == 'play':
-                self.play()
-
-    def on_mqtt_disconnect(self, client, userdata, rc):
-        print("----------- mqtt disconnect ---------------")
-        print(self.device.cast_type)
-        print(rc)
-    
+    # def on_mqtt_message(self, client, userdata, message):
+    #     parameter = message.payload.decode("utf-8")
+    #     cmd = os.path.basename(os.path.normpath(message.topic))
+    #     if cmd == 'play':
+    #         self.play(parameter)
+    #     else:
+    #         if parameter == 'pause':
+    #             self.pause()
+    #         if parameter == 'fwd':
+    #             self.fwd()
+    #         if parameter == 'rev':
+    #             self.rev()
+    #         if parameter == 'quit':
+    #             self.quit()
+    #         if parameter == 'stop':
+    #             self.stop()
+    #         if parameter == 'play':
+    #             self.play()
+    #
+    # def on_mqtt_disconnect(self, client, userdata, rc):
+    #     print("----------- mqtt disconnect ---------------")
+    #     print(self.device.cast_type)
+    #     print(rc)
+    #
     def new_cast_status(self, status):
         print("----------- new cast status ---------------")
         print(status)
@@ -68,8 +66,7 @@ class ChromeEvent:
 
         if self.device.media_controller.status.player_state == "PLAYING":
             self.state()
-        publish.single(self.mqttroot+'/app', app_name, hostname=self.mqtthost, port=self.mqttport, retain=True)
-        #publish.single('chromecast/app',  app_name, hostname=self.mqtthost, port=self.mqttport, retain=True)
+        self.mqtt.publish(self.mqttpath +'/app', app_name)
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
@@ -82,19 +79,10 @@ class ChromeEvent:
                 time.sleep(1)
                 self.device.media_controller.update_status()
 
-            # The following is needed to update radio / tv programme displayed on dashboard
-            if self.status.app() == 'Radio' or self.status.app() == 'TV' or self.status.app() == 'DR TV' :
-                time.sleep(20)
-                self.device.media_controller.update_status()
-
     def __mqtt_publish(self, msg):
-        msg = [
-            {'topic': self.mqttroot + '/media', 'payload': msg.json(), 'retain': True },
-            #{'topic': 'chromecast/media', 'payload': msg.json(), 'retain': True },
-            {'topic': self.mqttroot + '/state', 'payload': msg.player_state, 'retain': True },
-            #{'topic': 'chromecast/state', 'payload': msg.player_state, 'retain': True },
-            ]
-        publish.multiple( msg , hostname=self.mqtthost, port=self.mqttport)
+        self.mqtt.publish(self.mqttpath + '/media', msg.json())
+        self.mqtt.publish(self.mqttpath + '/state', msg.player_state)
+
 
     def stop(self):
         """ Stop playing on the chromecast """
