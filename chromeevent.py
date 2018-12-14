@@ -10,13 +10,12 @@ import os
 
 class ChromeEvent:
     """ Chrome event handling """
-    def __init__(self, device, streams):
+    def __init__(self, device):
 
         self.mqtthost = os.environ['MQTT_HOST']
         self.mqttport = int(os.environ['MQTT_PORT'])
         self.mqttroot = os.environ['MQTT_ROOT']
 
-        self.streams = streams
         self.device = device
         self.device.register_status_listener(self)
         self.device.media_controller.register_status_listener(self)
@@ -54,13 +53,6 @@ class ChromeEvent:
         print(self.device.cast_type)
         print(rc)
     
-
-    def getChannelList(self):
-        if self.device.cast_type == 'audio':
-            return self.streams.get_channel_list('audio/mp3')
-        else:
-            return self.streams.get_channel_list('video/mp4')
-
     def new_cast_status(self, status):
         print("----------- new cast status ---------------")
         print(status)
@@ -76,7 +68,7 @@ class ChromeEvent:
         if self.device.media_controller.status.player_state == "PLAYING":
             self.state()
         publish.single(self.mqttroot+'/app', app_name, hostname=self.mqtthost, port=self.mqttport, retain=True)
-        publish.single('chromecast/app',  app_name, hostname=self.mqtthost, port=self.mqttport, retain=True)
+        #publish.single('chromecast/app',  app_name, hostname=self.mqtthost, port=self.mqttport, retain=True)
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
@@ -97,9 +89,9 @@ class ChromeEvent:
     def __mqtt_publish(self, msg):
         msg = [
             {'topic': self.mqttroot + '/media', 'payload': msg.json(), 'retain': True },
-            {'topic': 'chromecast/media', 'payload': msg.json(), 'retain': True },
-            {'topic': self.mqttroot + '/state', 'payload': msg.player_state, 'retain': True },            
-            {'topic': 'chromecast/state', 'payload': msg.player_state, 'retain': True },            
+            #{'topic': 'chromecast/media', 'payload': msg.json(), 'retain': True },
+            {'topic': self.mqttroot + '/state', 'payload': msg.player_state, 'retain': True },
+            #{'topic': 'chromecast/state', 'payload': msg.player_state, 'retain': True },
             ]
         publish.multiple( msg , hostname=self.mqtthost, port=self.mqttport)
 
