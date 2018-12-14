@@ -12,9 +12,9 @@ class ChromeEvent:
     """ Chrome event handling """
     def __init__(self, device):
 
-        self.mqtthost = os.environ['MQTT_HOST']
-        self.mqttport = int(os.environ['MQTT_PORT'])
-        self.mqttroot = os.environ['MQTT_ROOT']
+        self.mqtthost = '10.9.8.184'
+        self.mqttport = 1883
+        self.mqttroot = 'Home/ChromeCasts/'
 
         self.device = device
         self.device.register_status_listener(self)
