@@ -109,20 +109,10 @@ class ChromeEvent:
 
     def play(self, media=None):
         """ Play a media URL on the chromecast """
-        if media is None:
-            self.device.media_controller.play()
-        else:
-            new_media = self.streams.get_channel_data(channelId=media)
-            if self.device.status.app_id is not None:
-                x = self.state()
-                if x.player_state == "PLAYING":
-                    if x.content == new_media.link:
-                        return
-            self.device.media_controller.play_media(new_media.link, new_media.media)
-            self.__mqtt_publish(self.state())
+        self.device.media_controller.play()
+        self.__mqtt_publish(self.state())
 
     def __createstate(self, state):
-        self.status.update(state, self.streams)
         return self.status
 
     def state(self):
