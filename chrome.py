@@ -9,8 +9,16 @@
     Copyright 2018: Thomas Bowman Mørch
 """
 import pychromecast
+from chromeevent import ChromeEvent
+from mqtt import MQTT
+
+mqtt = mqtt.MQTT()
+mqtt.conn()
+mqtt.loop_start()
 
 CASTS = pychromecast.get_chromecasts()
+c = CASTS[2]
+e = ChromeEvent(c)
 
 if len(CASTS) == 0:
     print("No Devices Found")
@@ -21,6 +29,8 @@ if CASTS[0].cast_type == "audio":
 else:
     AUDIO = CASTS[1]
     VIDEO = CASTS[0]
+
+ChromeEvent(C)
 
 AUDIO.wait()
 VIDEO.wait()
