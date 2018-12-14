@@ -2,7 +2,6 @@
     holds current state of the chromedevice
 """
 import json
-from dr import Dr
 from netflix import Netflix
 
 class ChromeState:
@@ -94,17 +93,6 @@ class ChromeState:
         except:
             print('"silently" thrown error away')
 
-        if ch is not None and ch.friendly is not None and ch.friendly != '':
-        # Assume that it is a streaming radio / video channel if we can resolve
-        # a friendly name for the s.content_id
-            d = Dr(ch.xmlid)
-            self.content = player.content_id
-            self.title = ch.friendly + " - " + d.title()
-            self.artist = None
-            self.album = None
-            self.media = ch.media
-            self.id = ch.id
-        else:
             self.id = None
             if self.__chrome_app == 'Netflix':
                 d = Netflix(player.content_id)
