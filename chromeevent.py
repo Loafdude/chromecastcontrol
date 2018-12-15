@@ -78,6 +78,7 @@ class ChromeEvent:
         self.mqtt.publish(self.mqttpath + "/media", json.dumps(self.device.media_controller.status.media_metadata))
 
     def mqtt_action(self, mosq, obj, msg):
+        print(msg)
         payload = msg.payload
         if payload == "stop":
             self.stop()
