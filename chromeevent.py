@@ -80,17 +80,17 @@ class ChromeEvent:
     def mqtt_action(self, mosq, obj, msg):
         print(msg.payload)
         payload = msg.payload
-        if payload == "stop":
+        if payload == b"stop":
             self.stop()
-        elif payload == "pause":
+        elif payload == b"pause":
             self.pause()
-        elif payload == "fwd" or payload == "next":
+        elif payload == b"fwd" or payload == b"next":
             self.fwd()
-        elif payload == "rev" or payload == "prev":
+        elif payload == b"rev" or payload == b"prev":
             self.rev()
-        elif payload == "quit":
+        elif payload == b"quit":
             self.quit()
-        elif payload == "play":
+        elif payload == b"play":
             self.play()
 
     def action(self, payload):
