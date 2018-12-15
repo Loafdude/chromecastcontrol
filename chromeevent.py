@@ -71,7 +71,7 @@ class ChromeEvent:
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
-        print(self.device.media_controller.status.media_metadata))
+        print(self.device.media_controller.status.media_metadata)
         self.mqtt.publish(self.mqttpath + "media", self.device.media_controller.status.media_metadata)
 
     def stop(self):
