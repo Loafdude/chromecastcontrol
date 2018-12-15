@@ -71,14 +71,8 @@ class ChromeEvent:
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
-        print(status)
-        self.__createstate(status)
-        self.__mqtt_publish(self.status)
-        if self.status.player_state == 'PLAYING':
-            # Netflix is not reporting nicely on play / pause state changes, so we poll it to get an up to date status
-            if self.status.app() == 'Netflix':
-                time.sleep(1)
-                self.device.media_controller.update_status()
+        print(self.update_status())
+        self.mqtt.publish(self.mqttpath + "media", self.update_status())
 
     def __mqtt_publish(self, msg):
         self.mqtt.publish(self.mqttpath + '/media', msg.json())
@@ -113,19 +107,28 @@ class ChromeEvent:
         self.device.media_controller.play()
         self.__mqtt_publish(self.state())
 
-    def __createstate(self, state):
-        return self.status
-
-    def state(self):
+    def update_status(self):
         """ Return state of the player """
-        if self.device.status.app_id is None:
-            self.status.clear()
-            return self.status
-        if self.device.status.app_id == 'E8C28D3C':
-            self.status.clear()
-            return self.status
-        s = self.device.media_controller.status
-        return self.__createstate(s)
+        self.status = {
+            'metadata_type': self.device.media_metadata.type,
+            'title': self.device.media_metadata.title,
+            'series_title': self.device.media_metadata.series_title,
+            'season': self.device.media_metadata.season,
+            'episode': self.device.media_metadata.episode,
+            'artist': self.device.media_metadata.artist,
+            'album_name': self.device.media_metadata.album_name,
+            'album_artist': self.device.media_metadata.album_artist,
+            'track': self.device.media_metadata.track,
+            'subtitle_tracks': self.device.media_metadata.subtitle_tracks,
+            'images': self.device.media_metadata.images,
+            'supports_pause': self.device.media_metadata.supports_pause,
+            'supports_seek': self.device.media_metadata.supports_seek,
+            'supports_stream_volume': self.device.media_metadata.supports_stream_volume,
+            'supports_stream_mute': self.device.media_metadata.supports_stream_mute,
+            'supports_skip_forward': self.device.media_metadata.supports_skip_forward,
+            'supports_skip_backward': self.device.media_metadata.supports_skip_backward,
+        }
+        return self.status
 
     def state_json(self):
         """ Returns status as json encoded string """
