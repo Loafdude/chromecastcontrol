@@ -14,6 +14,7 @@ class ChromeEvent:
 
         self.device = device
         self.device.register_status_listener(self)
+        self.device.media_controller.register_status_listener(self)
         self.status = ChromeState(device.device)
         self.room = room
         self.mqtt = mqtt

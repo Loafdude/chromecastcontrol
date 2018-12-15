@@ -21,6 +21,11 @@ CASTS = pychromecast.get_chromecasts()
 c = CASTS[2]
 e = ChromeEvent(c, 'Global', mqtt)
 
+e.new_cast_status(e.device.status)
+
+
+for
+
 if len(CASTS) == 0:
     print("No Devices Found")
     exit()
