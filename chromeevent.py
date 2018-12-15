@@ -71,13 +71,8 @@ class ChromeEvent:
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
-        print(self.update_status())
-        self.mqtt.publish(self.mqttpath + "media", self.update_status())
-
-    def __mqtt_publish(self, msg):
-        self.mqtt.publish(self.mqttpath + '/media', msg.json())
-        self.mqtt.publish(self.mqttpath + '/state', msg.player_state)
-
+        print(self.device.media_controller.status.media_metadata))
+        self.mqtt.publish(self.mqttpath + "media", self.device.media_controller.status.media_metadata)
 
     def stop(self):
         """ Stop playing on the chromecast """
@@ -107,28 +102,6 @@ class ChromeEvent:
         self.device.media_controller.play()
         self.__mqtt_publish(self.state())
 
-    def update_status(self):
-        """ Return state of the player """
-        self.status = {
-            'metadata_type': self.device.media_metadata.type,
-            'title': self.device.media_metadata.title,
-            'series_title': self.device.media_metadata.series_title,
-            'season': self.device.media_metadata.season,
-            'episode': self.device.media_metadata.episode,
-            'artist': self.device.media_metadata.artist,
-            'album_name': self.device.media_metadata.album_name,
-            'album_artist': self.device.media_metadata.album_artist,
-            'track': self.device.media_metadata.track,
-            'subtitle_tracks': self.device.media_metadata.subtitle_tracks,
-            'images': self.device.media_metadata.images,
-            'supports_pause': self.device.media_metadata.supports_pause,
-            'supports_seek': self.device.media_metadata.supports_seek,
-            'supports_stream_volume': self.device.media_metadata.supports_stream_volume,
-            'supports_stream_mute': self.device.media_metadata.supports_stream_mute,
-            'supports_skip_forward': self.device.media_metadata.supports_skip_forward,
-            'supports_skip_backward': self.device.media_metadata.supports_skip_backward,
-        }
-        return self.status
 
     def state_json(self):
         """ Returns status as json encoded string """
