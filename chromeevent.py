@@ -72,9 +72,23 @@ class ChromeEvent:
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
-        # self.mqtt.publish(self.mqttpath + "/media",)
         print(json.dumps(self.device.media_controller.status.media_metadata))
         self.mqtt.publish(self.mqttpath + "/media", json.dumps(self.device.media_controller.status.media_metadata))
+
+    def action(self, payload):
+        if payload == "stop":
+            self.stop()
+        elif payload == "pause":
+            self.pause()
+        elif payload == "fwd" or payload == "next":
+            self.fwd()
+        elif payload == "rev" or payload == "prev":
+            self.rev()
+        elif payload == "quit":
+            self.quit()
+        elif payload == "play":
+            self.play()
+
 
     def stop(self):
         """ Stop playing on the chromecast """
