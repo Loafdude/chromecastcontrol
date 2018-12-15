@@ -21,7 +21,7 @@ class ChromeEvent:
         self.mqtt = mqtt
         self.mqttpath = 'Home/' + self.room + '/ChromeCasts/' + self.device.name
         self.mqtt.subscribe(self.mqttpath + '/action')
-        self.connection.mqtt.message_callback_add(self.mqttpath + '/action', self.mqtt_action)
+        self.mqtt.message_callback_add(self.mqttpath + '/action', self.mqtt_action)
         # self.device.media_controller.register_status_listener(self)
         # if self.device.cast_type != 'audio':
         #     self.status.setApp('Backdrop')
