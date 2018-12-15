@@ -20,6 +20,8 @@ class ChromeEvent:
         self.room = room
         self.mqtt = mqtt
         self.mqttpath = 'Home/' + self.room + '/ChromeCasts/' + self.device.name
+        self.mqtt.subscribe(self.mqttpath + '/action')
+        self.connection.mqtt.message_callback_add(self.mqttpath + '/action', self.mqtt_action)
         # self.device.media_controller.register_status_listener(self)
         # if self.device.cast_type != 'audio':
         #     self.status.setApp('Backdrop')
@@ -75,7 +77,8 @@ class ChromeEvent:
         print(json.dumps(self.device.media_controller.status.media_metadata))
         self.mqtt.publish(self.mqttpath + "/media", json.dumps(self.device.media_controller.status.media_metadata))
 
-    def action(self, payload):
+    def mqtt_action(self, mosq, obj, msg):
+        payload = msg.payload
         if payload == "stop":
             self.stop()
         elif payload == "pause":
@@ -89,6 +92,19 @@ class ChromeEvent:
         elif payload == "play":
             self.play()
 
+    def action(self, payload):
+        if payload == "stop":
+            self.stop()
+        elif payload == "pause":
+            self.pause()
+        elif payload == "fwd" or payload == "next":
+            self.fwd()
+        elif payload == "rev" or payload == "prev":
+            self.rev()
+        elif payload == "quit":
+            self.quit()
+        elif payload == "play":
+            self.play()
 
     def stop(self):
         """ Stop playing on the chromecast """
