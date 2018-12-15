@@ -4,6 +4,7 @@
 
 import time
 from chromestate import ChromeState
+import json
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt_client
 import os
@@ -71,9 +72,9 @@ class ChromeEvent:
 
     def new_media_status(self, status):
         print("----------- new media status ---------------")
-        self.mqtt.publish(self.mqttpath + "/media",)
-        print(self.device.media_controller.status.media_metadata)
-        self.mqtt.publish(self.mqttpath + "/media", self.device.media_controller.status.media_metadata)
+        # self.mqtt.publish(self.mqttpath + "/media",)
+        print(json.dumps(self.device.media_controller.status.media_metadata))
+        self.mqtt.publish(self.mqttpath + "/media", json.dumps(self.device.media_controller.status.media_metadata))
 
     def stop(self):
         """ Stop playing on the chromecast """
